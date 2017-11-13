@@ -611,10 +611,10 @@ Pa.prototype.buildPage = function (data) {
   });
 
   this.container.appendChild(ul);
-  this.monit();
   this.container.appendChild(otherul);
-  _scrollManager2.default.scrollBy(otherul, 1000);
+  //   scrollManager.scrollBy(otherul, 1000)
   _scrollManager2.default.disableScroll(otherul);
+  this.monit();
 };
 
 Pa.prototype.monit = function () {
@@ -668,7 +668,7 @@ Pa.prototype.monit = function () {
 
   document.addEventListener('touchend', function (e) {
     if ( /* direction == 'up' && threshold > 100 */true) {
-      context.ul.classList.add('fly_up');
+      //   context.ul.classList.add('fly_up')
     }
   });
 };

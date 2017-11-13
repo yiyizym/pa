@@ -21,23 +21,23 @@
       position: relative;
       width: 100%;
       height: 500px;
-      overflow: hidden;
+      overflow: scroll;
       border: 1px solid red;
     }
     .pa_current_page {
-      width: 100%;
-      height: 100%;
-      overflow-y: scroll;
       background-color: #eee;
     }
     .pa_other_page {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow-y: scroll;
       bottom: 0;
       left: 0;
       z-index: -1;
+    }
+
+    .pa_up_pivot,
+    .pa_down_pivot {
+        height: 1px;
+        background: green;
     }
 
     .fly_up {
