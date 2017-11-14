@@ -2,110 +2,120 @@ import 'whatwg-fetch'
 import scrollManager from './scrollManager'
 
 const Pa = function (selector, url) {
-  if (!(this instanceof Pa)) {
-    return new Pa(selector, url)
-  }
-  this.container = document.querySelector(selector) || document.createElement('div')
-  this.container.classList.add('pa_container')
-  this.url = url
+    if (!(this instanceof Pa)) {
+        return new Pa(selector, url)
+    }
+    this.container = document.querySelector(selector) || document.createElement('div')
+    this.container.classList.add('pa_container')
+    this.url = url
 
-  this.fetch(url).then(resp => {
-    return resp.json()
-  }).then(this.buildPage.bind(this))
+    this.fetch(url).then(resp => {
+        return resp.json()
+    }).then(this.buildPage.bind(this))
 }
 
 Pa.prototype.fetch = function (url) {
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
+    return fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
 }
 
 Pa.prototype.buildPage = function (data) {
 
-  let ul = this.ul = document.createElement('ul')
-  ul.classList.add('pa_current_page')
-  data['list'].forEach(item => {
-    let li = document.createElement('li')
-    li.textContent = item.value
-    li.setAttribute('id', item.id)
-    ul.appendChild(li)
-  })
+    let ul = this.ul = document.createElement('ul')
+    ul.classList.add('pa_current_page')
+    data['list'].forEach(item => {
+        let li = document.createElement('li')
+        li.textContent = item.value
+        li.setAttribute('id', item.id)
+        ul.appendChild(li)
+    })
 
-  let otherul = this.otherul = document.createElement('ul')
-  otherul.classList.add('pa_other_page')
-  data['list'].forEach(item => {
-    let li = document.createElement('li')
-    li.textContent = Number(item.value) + 10
-    li.setAttribute('id', Number(item.id) + 10)
-    otherul.appendChild(li)
-  })
+    let otherul = this.otherul = document.createElement('ul')
+    otherul.classList.add('pa_other_page')
+    data['list'].forEach(item => {
+        let li = document.createElement('li')
+        li.textContent = Number(item.value) + 10
+        li.setAttribute('id', Number(item.id) + 10)
+        otherul.appendChild(li)
+    })
 
 
 
-  this.container.appendChild(ul)
-  this.container.appendChild(otherul)
-//   scrollManager.scrollBy(otherul, 1000)
-  scrollManager.disableScroll(otherul)
-  this.monit()
+    this.container.appendChild(ul)
+    //   this.container.appendChild(otherul)
+    //   scrollManager.scrollBy(otherul, 1000)
+    //   scrollManager.disableScroll(otherul)
+    this.monit(ul)
 }
 
-Pa.prototype.monit = function () {
-  var context = this
-  // var up_pivot = this.up_pivot = document.createElement('div')
-  // up_pivot.classList.add('pa_up_pivot')
-  // this.container.insertBefore(up_pivot, this.container.firstChild)
+Pa.prototype.monit = function (element) {
+    var context = this
+    var up_pivot = this.up_pivot = document.createElement('div')
+    up_pivot.classList.add('pa_up_pivot')
+    element.insertBefore(up_pivot, element.firstChild)
 
-  // var down_pivot = this.down_pivot = document.createElement('div')
-  // down_pivot.classList.add('pa_down_pivot')
-  // this.container.appendChild(down_pivot)
+    var down_pivot = this.down_pivot = document.createElement('div')
+    down_pivot.classList.add('pa_down_pivot')
+    element.appendChild(down_pivot)
 
-  let io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      console.log('see target! ', entry.target, entry.intersectionRatio)
-      // entry.target.classList.toggle('pa_visible', entry.intersectionRatio === 1)
+    let io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            console.log('see target! ', entry.target, entry.intersectionRatio)
+            entry.target.classList.toggle('pa_visible', entry.intersectionRatio === 1)
+        })
+    }, {
+            root: context.container,
+            threshold: 1
+        });
+
+    io.observe(up_pivot)
+    io.observe(down_pivot)
+
+    var ts, te;
+    document.addEventListener('touchstart', e => {
+        ts = e.touches[0].clientY
     })
-  }, {
-      root: context.container,
-      threshold: [0.02,0.98]
-    });
 
-  io.observe(context.ul)
-  // io.observe(down_pivot)
+    var ticking = false, direction;
+    document.addEventListener('touchmove', e => {
+        if (!ticking) {
+            window.requestAnimationFrame(function () {
 
-  var ts
-  document.addEventListener('touchstart', e => {
-    ts = e.touches[0].clientY
-  })
+                te = e.changedTouches[0].clientY
 
-  var ticking = false
-  document.addEventListener('touchmove', e => {
-    if(!ticking) {
-      window.requestAnimationFrame(function(){
-
-        var te = e.changedTouches[0].clientY
-        if(ts > te && context.down_pivot.classList.contains('pa_visible')){
-          // down
-          let distance = ts - te;
-          document.querySelector('.pa_current_page').style = `transform: translate3d(0,${-distance}px,0);`
-          console.log('show next page')
-        } else if(context.up_pivot.classList.contains('pa_visible')){
-          //up
-          console.log('show previous page')
+                if (determineDirection() == 'down' && context.down_pivot.classList.contains('pa_visible')) {
+                    // down
+                    document.querySelector('.pa_current_page').style.transform = `translate3d(0,${getDistance()}px,0);`
+                    console.log('show next page')
+                } else if (context.up_pivot.classList.contains('pa_visible')) {
+                    //up
+                    console.log('show previous page')
+                }
+                ticking = false;
+            });
         }
-        ticking = false;
-      });
-    }
-    ticking = true;
-  })
+        ticking = true;
+    })
 
-  document.addEventListener('touchend', e => {
-    if(/* direction == 'up' && threshold > 100 */ true){
-    //   context.ul.classList.add('fly_up')
+    document.addEventListener('touchend', e => {
+        if (context.down_pivot.classList.contains('pa_visible') && determineDirection() == 'down' && getDistance() < -100) {
+            context.ul.classList.add('fly_up')
+        }
+    })
+
+    function determineDirection(){
+        console.log('determineDirection: ', ts > te ? 'down' : 'up');
+        return ts > te ? 'down' : 'up';
     }
-  })
+
+    function getDistance(){
+        console.log('getDistance: ', te - ts);
+        return te - ts;
+    }
 
 }
 
