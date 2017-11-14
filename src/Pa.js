@@ -54,26 +54,26 @@ Pa.prototype.buildPage = function (data) {
 
 Pa.prototype.monit = function () {
   var context = this
-  var up_pivot = this.up_pivot = document.createElement('div')
-  up_pivot.classList.add('pa_up_pivot')
-  this.container.insertBefore(up_pivot, this.container.firstChild)
+  // var up_pivot = this.up_pivot = document.createElement('div')
+  // up_pivot.classList.add('pa_up_pivot')
+  // this.container.insertBefore(up_pivot, this.container.firstChild)
 
-  var down_pivot = this.down_pivot = document.createElement('div')
-  down_pivot.classList.add('pa_down_pivot')
-  this.container.appendChild(down_pivot)
+  // var down_pivot = this.down_pivot = document.createElement('div')
+  // down_pivot.classList.add('pa_down_pivot')
+  // this.container.appendChild(down_pivot)
 
   let io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       console.log('see target! ', entry.target, entry.intersectionRatio)
-      entry.target.classList.toggle('pa_visible', entry.intersectionRatio === 1)
+      // entry.target.classList.toggle('pa_visible', entry.intersectionRatio === 1)
     })
   }, {
       root: context.container,
-      threshold: 1.0
+      threshold: [0.02,0.98]
     });
 
-  io.observe(up_pivot)
-  io.observe(down_pivot)
+  io.observe(context.ul)
+  // io.observe(down_pivot)
 
   var ts
   document.addEventListener('touchstart', e => {

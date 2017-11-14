@@ -3,6 +3,7 @@ export default {
   // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
   keys: {37: 1, 38: 1, 39: 1, 40: 1},
   preventDefault: function (e) {
+    console.log('catched scroll!')
     e = e || window.event;
     if (e.preventDefault)
         e.preventDefault();
@@ -15,12 +16,14 @@ export default {
     }
   },
   disableScroll: function (el) {
+    console.log('set up disable scroll')
     if (el.addEventListener){ // older FF
       el.addEventListener('DOMMouseScroll', this.preventDefault, false);
     }
     el.onwheel = this.preventDefault; // modern standard
     el.onmousewheel = el.onmousewheel = this.preventDefault; // older browsers, IE
     el.ontouchmove  = this.preventDefault; // mobile
+    el.onscroll = this.preventDefault;
     el.onkeydown  = this.preventDefaultForScrollKeys;
   },
 
