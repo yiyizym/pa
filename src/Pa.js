@@ -87,6 +87,8 @@ Pa.prototype.monit = function (element) {
 
                 afterPosition = e.changedTouches[0].clientY
 
+                document.querySelector('.pa_current_page').classList.toggle('touch_moving', context.down_pivot.classList.contains('pa_visible') || context.up_pivot.classList.contains('pa_visible'))
+
                 if (context.down_pivot.classList.contains('pa_visible')){
                     if (determineDirection() == 'down'){
                         document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
@@ -128,6 +130,8 @@ Pa.prototype.monit = function (element) {
                 el.style.transform = 'translateY(0%)';
                 resetAccumulatedDistance();
             })
+        } else {
+            context.ul.style.transform = 'translateY(0%)';
         }
     })
 
