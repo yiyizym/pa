@@ -75,9 +75,9 @@ Pa.prototype.monit = function (element) {
     io.observe(up_pivot)
     io.observe(down_pivot)
 
-    var ts, te;
+    var formerPosition, afterPosition;
     document.addEventListener('touchstart', e => {
-        ts = e.touches[0].clientY
+        formerPosition = e.touches[0].clientY
     })
 
     var ticking = false, direction;
@@ -85,16 +85,17 @@ Pa.prototype.monit = function (element) {
         if (!ticking) {
             window.requestAnimationFrame(function () {
 
-                te = e.changedTouches[0].clientY
+                afterPosition = e.changedTouches[0].clientY
 
                 if (determineDirection() == 'down' && context.down_pivot.classList.contains('pa_visible')) {
                     // down
-                    document.querySelector('.pa_current_page').style.transform = `translate3d(0,${getDistance()}px,0);`
                     console.log('show next page')
-                } else if (context.up_pivot.classList.contains('pa_visible')) {
-                    //up
+                } else if (determineDirection() == 'up' && context.up_pivot.classList.contains('pa_visible')) {
+                    // up
                     console.log('show previous page')
                 }
+                document.querySelector('.pa_current_page').style.transform = 'translateY('+ getAccumulatedDistance() + 'px)';
+                formerPosition = afterPosition;
                 ticking = false;
             });
         }
@@ -102,20 +103,46 @@ Pa.prototype.monit = function (element) {
     })
 
     document.addEventListener('touchend', e => {
-        if (context.down_pivot.classList.contains('pa_visible') && determineDirection() == 'down' && getDistance() < -100) {
-            context.ul.classList.add('fly_up')
+        if (context.down_pivot.classList.contains('pa_visible') && (determineDirection() == 'down' || determineDirection() == 'equal') && getAccumulatedDistance() < -100) {
+            setClazThen(context.ul, 'go_up',function(el){
+                el.classList.remove('go_up');
+                el.style.transform = 'translateY(100%)';
+                resetAccumulatedDistance();
+            })
+        } else if (context.down_pivot.classList.contains('pa_visible') && (determineDirection() == 'down' || determineDirection() == 'equal') && getAccumulatedDistance() >= -100){
+            setClazThen(context.ul, 'go_down', function (el) {
+                el.classList.remove('go_down');
+                el.style.transform = 'translateY(0%)';
+                resetAccumulatedDistance();
+            })
         }
     })
 
     function determineDirection(){
-        console.log('determineDirection: ', ts > te ? 'down' : 'up');
-        return ts > te ? 'down' : 'up';
+        var direction = formerPosition > afterPosition ? 'down' : formerPosition < afterPosition ? 'up' : 'equal';
+        console.log('determineDirection: ', direction);
+        return direction;
     }
 
-    function getDistance(){
-        console.log('getDistance: ', te - ts);
-        return te - ts;
+    var accumulatedDistance = 0;
+    var getAccumulatedDistance = function(){
+        accumulatedDistance += afterPosition - formerPosition;
+        console.log('accumulatedDistance: ', accumulatedDistance);
+        return accumulatedDistance;
     }
+    var resetAccumulatedDistance = function(){
+        accumulatedDistance = 0;
+    }
+
+    var setClazThen = (function(){
+        var latency = 300;
+        return function(el, clz, cb){
+            el.classList.add(clz);
+            setTimeout(function(){
+                cb && cb(el);
+            }, latency);
+        }
+    })();
 
 }
 
