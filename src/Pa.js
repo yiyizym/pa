@@ -87,14 +87,27 @@ Pa.prototype.monit = function (element) {
 
                 afterPosition = e.changedTouches[0].clientY
 
-                if (determineDirection() == 'down' && context.down_pivot.classList.contains('pa_visible')) {
-                    // down
-                    console.log('show next page')
-                } else if (determineDirection() == 'up' && context.up_pivot.classList.contains('pa_visible')) {
-                    // up
-                    console.log('show previous page')
+                if (context.down_pivot.classList.contains('pa_visible')){
+                    if (determineDirection() == 'down'){
+                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
+                        console.log('show next page')
+                    } else if (determineDirection() == 'up') {
+                        if (getAccumulatedDistance() < 0){
+                            document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
+                        }
+                        console.log('resume')
+                    }
+                } else if (context.up_pivot.classList.contains('pa_visible')){
+                    if (determineDirection() == 'up'){
+                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
+                        console.log('show previous page')
+                    } else if (determineDirection() == 'down') {
+                        if (getAccumulatedDistance() > 0){
+                            document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
+                        }
+                        console.log('resume')
+                    }
                 }
-                document.querySelector('.pa_current_page').style.transform = 'translateY('+ getAccumulatedDistance() + 'px)';
                 formerPosition = afterPosition;
                 ticking = false;
             });
@@ -126,8 +139,9 @@ Pa.prototype.monit = function (element) {
 
     var accumulatedDistance = 0;
     var getAccumulatedDistance = function(){
+        console.log('former accumulatedDistance: ', accumulatedDistance);
         accumulatedDistance += afterPosition - formerPosition;
-        console.log('accumulatedDistance: ', accumulatedDistance);
+        console.log('after accumulatedDistance: ', accumulatedDistance);
         return accumulatedDistance;
     }
     var resetAccumulatedDistance = function(){
