@@ -90,16 +90,16 @@ Pa.prototype.monit = function (element) {
                 setTurnPage();
 
                 if (context.up_pivot.classList.contains('pa_visible') && isTurnPage) {
-                    if (determineDirection() == 'up') {
+                    if (determineDirection() == 'down') {
                         console.log('show previous page')
-                    } else if (determineDirection() == 'down') {
+                    } else if (determineDirection() == 'up') {
                         console.log('resume')
                     }
                     document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
                 } else if (context.down_pivot.classList.contains('pa_visible') && isTurnPage){
-                    if (determineDirection() == 'down'){
+                    if (determineDirection() == 'up'){
                         console.log('show next page')
-                    } else if (determineDirection() == 'up') {
+                    } else if (determineDirection() == 'down') {
                         console.log('resume')
                     }
                     document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(),0) + 'px)';
@@ -112,26 +112,29 @@ Pa.prototype.monit = function (element) {
     })
 
     document.addEventListener('touchend', e => {
-        if (context.down_pivot.classList.contains('pa_visible') && (determineDirection() == 'down' || determineDirection() == 'equal') && getAccumulatedDistance() < -100) {
+        if (context.down_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() < -100) {
             setClazThen(context.ul, 'go_up',function(el){
                 el.classList.remove('go_up', 'turn_page');
                 el.style.transform = 'translateY(100%)';
                 resetAccumulatedDistance();
             })
-        } else if (context.down_pivot.classList.contains('pa_visible') && (determineDirection() == 'down' || determineDirection() == 'equal') && getAccumulatedDistance() >= -100){
+        } else if (context.up_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() >= 100){
             setClazThen(context.ul, 'go_down', function (el) {
                 el.classList.remove('go_down', 'turn_page');
                 el.style.transform = 'translateY(0%)';
                 resetAccumulatedDistance();
             })
         } else {
+            resetAccumulatedDistance();
             context.ul.style.transform = 'translateY(0%)';
         }
         resetTurnPage();
     })
 
     function determineDirection(){
-        var direction = formerPosition > afterPosition ? 'down' : formerPosition < afterPosition ? 'up' : 'equal';
+        //由旧位置到新位置，如果线径是向上走的，就是 up
+        //由旧位置到新位置，如果线径是向下走的，就是 down
+        var direction = formerPosition > afterPosition ? 'up' : formerPosition < afterPosition ? 'down' : 'equal';
         console.log('determineDirection: ', direction);
         return direction;
     }
@@ -139,11 +142,14 @@ Pa.prototype.monit = function (element) {
     var accumulatedDistance = 0;
     var getAccumulatedDistance = function(){
         console.log('former accumulatedDistance: ', accumulatedDistance);
+        //新位置在旧位置的上方，会是负数
+        //新位置在旧位置的下方，会是正数
         accumulatedDistance += afterPosition - formerPosition;
         console.log('after accumulatedDistance: ', accumulatedDistance);
         return accumulatedDistance;
     }
     var resetAccumulatedDistance = function(){
+        console.log('resetAccumulatedDistance')
         accumulatedDistance = 0;
     }
 
@@ -163,8 +169,8 @@ Pa.prototype.monit = function (element) {
             console.log('turnPage setted, return')
             return;
         }
-        if ((context.down_pivot.classList.contains('pa_visible') && determineDirection() == 'down') ||
-            (context.up_pivot.classList.contains('pa_visible') && determineDirection() == 'up')){
+        if ((context.down_pivot.classList.contains('pa_visible') && determineDirection() == 'up') ||
+            (context.up_pivot.classList.contains('pa_visible') && determineDirection() == 'down')){
                 turnPageSetted = true;
                 isTurnPage = true;
                 document.querySelector('.pa_current_page').classList.add('turn_page')
