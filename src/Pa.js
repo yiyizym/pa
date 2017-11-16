@@ -89,22 +89,20 @@ Pa.prototype.monit = function (element) {
 
                 setTurnPage();
 
-                if (context.down_pivot.classList.contains('pa_visible') && isTurnPage){
-                    if (determineDirection() == 'down'){
-                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(), 0)+ 'px)';
-                        console.log('show next page')
-                    } else if (determineDirection() == 'up') {
-                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(),0) + 'px)';
-                        console.log('resume')
-                    }
-                } else if (context.up_pivot.classList.contains('pa_visible') && isTurnPage){
-                    if (determineDirection() == 'up'){
-                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(),0) + 'px)';
+                if (context.up_pivot.classList.contains('pa_visible') && isTurnPage) {
+                    if (determineDirection() == 'up') {
                         console.log('show previous page')
                     } else if (determineDirection() == 'down') {
-                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(),0) + 'px)';
                         console.log('resume')
                     }
+                    document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
+                } else if (context.down_pivot.classList.contains('pa_visible') && isTurnPage){
+                    if (determineDirection() == 'down'){
+                        console.log('show next page')
+                    } else if (determineDirection() == 'up') {
+                        console.log('resume')
+                    }
+                    document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(),0) + 'px)';
                 }
                 formerPosition = afterPosition;
                 ticking = false;
