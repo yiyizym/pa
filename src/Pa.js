@@ -89,7 +89,7 @@ Pa.prototype.monit = function (element) {
 
                 setTurnPage();
 
-                if (context.down_pivot.classList.contains('pa_visible')){
+                if (context.down_pivot.classList.contains('pa_visible') && isTurnPage){
                     if (determineDirection() == 'down'){
                         document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(), 0)+ 'px)';
                         console.log('show next page')
@@ -97,7 +97,7 @@ Pa.prototype.monit = function (element) {
                         document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(),0) + 'px)';
                         console.log('resume')
                     }
-                } else if (context.up_pivot.classList.contains('pa_visible')){
+                } else if (context.up_pivot.classList.contains('pa_visible') && isTurnPage){
                     if (determineDirection() == 'up'){
                         document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(),0) + 'px)';
                         console.log('show previous page')
@@ -161,16 +161,21 @@ Pa.prototype.monit = function (element) {
 
     var isTurnPage = false, turnPageSetted = false;
     var setTurnPage = function(){
-        if(turnPageSetted){return;}
+        if(turnPageSetted){
+            console.log('turnPage setted, return')
+            return;
+        }
         if ((context.down_pivot.classList.contains('pa_visible') && determineDirection() == 'down') ||
             (context.up_pivot.classList.contains('pa_visible') && determineDirection() == 'up')){
-            turnPageSetted = true;
-            isTurnPage = true;
-            document.querySelector('.pa_current_page').classList.add('turn_page')
-        }
+                turnPageSetted = true;
+                isTurnPage = true;
+                document.querySelector('.pa_current_page').classList.add('turn_page')
+            }
+        console.log('isTurnPage: ', isTurnPage);
     }
 
     var resetTurnPage = function(){
+        console.log('resetTurnPage')
         isTurnPage = false;
         turnPageSetted = false;
         document.querySelector('.pa_current_page').classList.remove('turn_page')
