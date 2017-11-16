@@ -87,26 +87,22 @@ Pa.prototype.monit = function (element) {
 
                 afterPosition = e.changedTouches[0].clientY
 
-                document.querySelector('.pa_current_page').classList.toggle('touch_moving', context.down_pivot.classList.contains('pa_visible') || context.up_pivot.classList.contains('pa_visible'))
+                setTurnPage();
 
                 if (context.down_pivot.classList.contains('pa_visible')){
                     if (determineDirection() == 'down'){
-                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
+                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(), 0)+ 'px)';
                         console.log('show next page')
                     } else if (determineDirection() == 'up') {
-                        if (getAccumulatedDistance() < 0){
-                            document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
-                        }
+                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(),0) + 'px)';
                         console.log('resume')
                     }
                 } else if (context.up_pivot.classList.contains('pa_visible')){
                     if (determineDirection() == 'up'){
-                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
+                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(),0) + 'px)';
                         console.log('show previous page')
                     } else if (determineDirection() == 'down') {
-                        if (getAccumulatedDistance() > 0){
-                            document.querySelector('.pa_current_page').style.transform = 'translateY(' + getAccumulatedDistance() + 'px)';
-                        }
+                        document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(),0) + 'px)';
                         console.log('resume')
                     }
                 }
@@ -120,19 +116,20 @@ Pa.prototype.monit = function (element) {
     document.addEventListener('touchend', e => {
         if (context.down_pivot.classList.contains('pa_visible') && (determineDirection() == 'down' || determineDirection() == 'equal') && getAccumulatedDistance() < -100) {
             setClazThen(context.ul, 'go_up',function(el){
-                el.classList.remove('go_up');
+                el.classList.remove('go_up', 'turn_page');
                 el.style.transform = 'translateY(100%)';
                 resetAccumulatedDistance();
             })
         } else if (context.down_pivot.classList.contains('pa_visible') && (determineDirection() == 'down' || determineDirection() == 'equal') && getAccumulatedDistance() >= -100){
             setClazThen(context.ul, 'go_down', function (el) {
-                el.classList.remove('go_down');
+                el.classList.remove('go_down', 'turn_page');
                 el.style.transform = 'translateY(0%)';
                 resetAccumulatedDistance();
             })
         } else {
             context.ul.style.transform = 'translateY(0%)';
         }
+        resetTurnPage();
     })
 
     function determineDirection(){
@@ -161,6 +158,23 @@ Pa.prototype.monit = function (element) {
             }, latency);
         }
     })();
+
+    var isTurnPage = false, turnPageSetted = false;
+    var setTurnPage = function(){
+        if(turnPageSetted){return;}
+        if ((context.down_pivot.classList.contains('pa_visible') && determineDirection() == 'down') ||
+            (context.up_pivot.classList.contains('pa_visible') && determineDirection() == 'up')){
+            turnPageSetted = true;
+            isTurnPage = true;
+            document.querySelector('.pa_current_page').classList.add('turn_page')
+        }
+    }
+
+    var resetTurnPage = function(){
+        isTurnPage = false;
+        turnPageSetted = false;
+        document.querySelector('.pa_current_page').classList.remove('turn_page')
+    }
 
 }
 
