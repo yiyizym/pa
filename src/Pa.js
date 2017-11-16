@@ -25,31 +25,31 @@ Pa.prototype.fetch = function (url) {
 
 Pa.prototype.buildPage = function (data) {
 
-    let ul = this.ul = document.createElement('ul')
-    ul.classList.add('pa_current_page')
+    let currPage = this.currPage = document.createElement('ul')
+    currPage.classList.add('current_page')
     data['list'].forEach(item => {
         let li = document.createElement('li')
         li.textContent = item.value
         li.setAttribute('id', item.id)
-        ul.appendChild(li)
+        currPage.appendChild(li)
     })
 
-    let otherul = this.otherul = document.createElement('ul')
-    otherul.classList.add('pa_other_page')
+    let nextPage = this.nextPage = document.createElement('ul')
+    nextPage.classList.add('next_page')
     data['list'].forEach(item => {
         let li = document.createElement('li')
         li.textContent = Number(item.value) + 10
         li.setAttribute('id', Number(item.id) + 10)
-        otherul.appendChild(li)
+        nextPage.appendChild(li)
     })
 
 
 
-    this.container.appendChild(ul)
-    //   this.container.appendChild(otherul)
-    //   scrollManager.scrollBy(otherul, 1000)
-    //   scrollManager.disableScroll(otherul)
-    this.monit(ul)
+    this.container.appendChild(currPage)
+      this.container.appendChild(nextPage)
+    //   scrollManager.scrollBy(nextPage, 1000)
+    //   scrollManager.disableScroll(nextPage)
+    this.monit(currPage)
 }
 
 Pa.prototype.monit = function (element) {
@@ -95,14 +95,14 @@ Pa.prototype.monit = function (element) {
                     } else if (determineDirection() == 'up') {
                         console.log('resume')
                     }
-                    document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
+                    document.querySelector('.current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
                 } else if (context.down_pivot.classList.contains('pa_visible') && isTurnPage){
                     if (determineDirection() == 'up'){
                         console.log('show next page')
                     } else if (determineDirection() == 'down') {
                         console.log('resume')
                     }
-                    document.querySelector('.pa_current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(),0) + 'px)';
+                    document.querySelector('.current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(),0) + 'px)';
                 }
                 formerPosition = afterPosition;
                 ticking = false;
@@ -113,20 +113,22 @@ Pa.prototype.monit = function (element) {
 
     document.addEventListener('touchend', e => {
         if (context.down_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() < -100) {
-            setClazThen(context.ul, 'go_up',function(el){
+            setClazThen(context.currPage, 'go_up',function(el){
                 el.classList.remove('go_up', 'turn_page');
-                el.style.transform = 'translateY(100%)';
+                el.classList.add('hidden');
+                // el.style.transform = 'translateY(-100%)';
                 resetAccumulatedDistance();
             })
         } else if (context.up_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() >= 100){
-            setClazThen(context.ul, 'go_down', function (el) {
-                el.classList.remove('go_down', 'turn_page');
-                el.style.transform = 'translateY(0%)';
+            setClazThen(context.currPage, 'go_down', function (el) {
+                el.classList.remove('go_down', 'turn_page')
+                el.classList.add('hidden');
+                // el.style.transform = 'translateY(0%)';
                 resetAccumulatedDistance();
             })
         } else {
             resetAccumulatedDistance();
-            context.ul.style.transform = 'translateY(0%)';
+            context.currPage.style.transform = 'translateY(0%)';
         }
         resetTurnPage();
     })
@@ -173,7 +175,7 @@ Pa.prototype.monit = function (element) {
             (context.up_pivot.classList.contains('pa_visible') && determineDirection() == 'down')){
                 turnPageSetted = true;
                 isTurnPage = true;
-                document.querySelector('.pa_current_page').classList.add('turn_page')
+                document.querySelector('.current_page').classList.add('turn_page')
             }
         console.log('isTurnPage: ', isTurnPage);
     }
@@ -182,7 +184,7 @@ Pa.prototype.monit = function (element) {
         console.log('resetTurnPage')
         isTurnPage = false;
         turnPageSetted = false;
-        document.querySelector('.pa_current_page').classList.remove('turn_page')
+        document.querySelector('.current_page').classList.remove('turn_page')
     }
 
 }

@@ -10,7 +10,9 @@
         * {
             box-sizing: border-box;
         }
-
+        .hidden {
+            display: none;
+        }
         ul {
             margin: 0;
             padding: 0;
@@ -29,14 +31,16 @@
             border: 1px solid red;
         }
 
-        .pa_current_page {
+        .current_page {
             height: 100%;
             overflow-y: scroll;
             background-color: rgba(0,0,0,0.1);
         }
 
-        .pa_other_page {
+        .next_page {
             position: absolute;
+            height: 100%;
+            width: 100%;
             overflow-y: scroll;
             bottom: 0;
             left: 0;
