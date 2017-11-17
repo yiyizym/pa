@@ -25,12 +25,22 @@ Pa.prototype.fetch = function (url) {
 
 Pa.prototype.buildPage = function (data) {
 
-    let currPage = this.currPage = document.createElement('ul')
-    currPage.classList.add('current_page')
+    let prevPage = this.prevPage = document.createElement('ul')
+    prevPage.classList.add('prev_page')
     data['list'].forEach(item => {
         let li = document.createElement('li')
         li.textContent = item.value
         li.setAttribute('id', item.id)
+        prevPage.appendChild(li)
+    })
+
+
+    let currPage = this.currPage = document.createElement('ul')
+    currPage.classList.add('current_page')
+    data['list'].forEach(item => {
+        let li = document.createElement('li')
+        li.textContent = Number(item.value) + 10
+        li.setAttribute('id', Number(item.id) + 10)
         currPage.appendChild(li)
     })
 
@@ -38,17 +48,16 @@ Pa.prototype.buildPage = function (data) {
     nextPage.classList.add('next_page')
     data['list'].forEach(item => {
         let li = document.createElement('li')
-        li.textContent = Number(item.value) + 10
-        li.setAttribute('id', Number(item.id) + 10)
+        li.textContent = Number(item.value) + 20
+        li.setAttribute('id', Number(item.id) + 20)
         nextPage.appendChild(li)
     })
 
 
 
+    this.container.appendChild(prevPage)
     this.container.appendChild(currPage)
-      this.container.appendChild(nextPage)
-    //   scrollManager.scrollBy(nextPage, 1000)
-    //   scrollManager.disableScroll(nextPage)
+    this.container.appendChild(nextPage)
     this.monit(currPage)
 }
 
@@ -96,13 +105,13 @@ Pa.prototype.monit = function (element) {
                         console.log('resume')
                     }
                     document.querySelector('.current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
-                } else if (context.down_pivot.classList.contains('pa_visible') && isTurnPage){
-                    if (determineDirection() == 'up'){
+                } else if (context.down_pivot.classList.contains('pa_visible') && isTurnPage) {
+                    if (determineDirection() == 'up') {
                         console.log('show next page')
                     } else if (determineDirection() == 'down') {
                         console.log('resume')
                     }
-                    document.querySelector('.current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(),0) + 'px)';
+                    document.querySelector('.current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(), 0) + 'px)';
                 }
                 formerPosition = afterPosition;
                 ticking = false;
@@ -113,17 +122,15 @@ Pa.prototype.monit = function (element) {
 
     document.addEventListener('touchend', e => {
         if (context.down_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() < -100) {
-            setClazThen(context.currPage, 'go_up',function(el){
-                el.classList.remove('go_up', 'turn_page');
-                el.classList.add('hidden');
-                // el.style.transform = 'translateY(-100%)';
+            setClazThen(context.currPage, 'go_up', function (el) {
+                turnToNextPage(el);
                 resetAccumulatedDistance();
             })
-        } else if (context.up_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() >= 100){
+        } else if (context.up_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() >= 100) {
             setClazThen(context.currPage, 'go_down', function (el) {
+                turnToPrevPage();
                 el.classList.remove('go_down', 'turn_page')
                 el.classList.add('hidden');
-                // el.style.transform = 'translateY(0%)';
                 resetAccumulatedDistance();
             })
         } else {
@@ -133,7 +140,7 @@ Pa.prototype.monit = function (element) {
         resetTurnPage();
     })
 
-    function determineDirection(){
+    function determineDirection() {
         //由旧位置到新位置，如果线径是向上走的，就是 up
         //由旧位置到新位置，如果线径是向下走的，就是 down
         var direction = formerPosition > afterPosition ? 'up' : formerPosition < afterPosition ? 'down' : 'equal';
@@ -142,7 +149,7 @@ Pa.prototype.monit = function (element) {
     }
 
     var accumulatedDistance = 0;
-    var getAccumulatedDistance = function(){
+    var getAccumulatedDistance = function () {
         console.log('former accumulatedDistance: ', accumulatedDistance);
         //新位置在旧位置的上方，会是负数
         //新位置在旧位置的下方，会是正数
@@ -150,41 +157,52 @@ Pa.prototype.monit = function (element) {
         console.log('after accumulatedDistance: ', accumulatedDistance);
         return accumulatedDistance;
     }
-    var resetAccumulatedDistance = function(){
+    var resetAccumulatedDistance = function () {
         console.log('resetAccumulatedDistance')
         accumulatedDistance = 0;
     }
 
-    var setClazThen = (function(){
+    var setClazThen = (function () {
         var latency = 300;
-        return function(el, clz, cb){
+        return function (el, clz, cb) {
             el.classList.add(clz);
-            setTimeout(function(){
+            setTimeout(function () {
                 cb && cb(el);
             }, latency);
         }
     })();
 
     var isTurnPage = false, turnPageSetted = false;
-    var setTurnPage = function(){
-        if(turnPageSetted){
+    var setTurnPage = function () {
+        if (turnPageSetted) {
             console.log('turnPage setted, return')
             return;
         }
         if ((context.down_pivot.classList.contains('pa_visible') && determineDirection() == 'up') ||
-            (context.up_pivot.classList.contains('pa_visible') && determineDirection() == 'down')){
-                turnPageSetted = true;
-                isTurnPage = true;
-                document.querySelector('.current_page').classList.add('turn_page')
-            }
+            (context.up_pivot.classList.contains('pa_visible') && determineDirection() == 'down')) {
+            turnPageSetted = true;
+            isTurnPage = true;
+            document.querySelector('.current_page').classList.add('turn_page')
+        }
         console.log('isTurnPage: ', isTurnPage);
     }
 
-    var resetTurnPage = function(){
+    var resetTurnPage = function () {
         console.log('resetTurnPage')
         isTurnPage = false;
         turnPageSetted = false;
         document.querySelector('.current_page').classList.remove('turn_page')
+    }
+
+
+    function turnToNextPage(currentPage) {
+        currentPage.classList.remove('go_up', 'turn_page');
+        currentPage.classList.add('hidden');
+
+    }
+
+    function turnToPrevPage() {
+
     }
 
 }
