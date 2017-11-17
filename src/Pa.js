@@ -104,14 +104,14 @@ Pa.prototype.monit = function (element) {
                     } else if (determineDirection() == 'up') {
                         console.log('resume')
                     }
-                    document.querySelector('.current_page').style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
+                    context.prevPage.style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
                 } else if (context.down_pivot.classList.contains('pa_visible') && isTurnPage) {
                     if (determineDirection() == 'up') {
                         console.log('show next page')
                     } else if (determineDirection() == 'down') {
                         console.log('resume')
                     }
-                    document.querySelector('.current_page').style.transform = 'translateY(' + Math.min(getAccumulatedDistance(), 0) + 'px)';
+                    context.currPage.style.transform = 'translateY(' + Math.min(getAccumulatedDistance(), 0) + 'px)';
                 }
                 formerPosition = afterPosition;
                 ticking = false;
@@ -123,14 +123,12 @@ Pa.prototype.monit = function (element) {
     document.addEventListener('touchend', e => {
         if (context.down_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() < -100) {
             setClazThen(context.currPage, 'go_up', function (el) {
-                turnToNextPage(el);
+                turnToNextPage();
                 resetAccumulatedDistance();
             })
         } else if (context.up_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() >= 100) {
-            setClazThen(context.currPage, 'go_down', function (el) {
+            setClazThen(context.prevPage, 'go_down', function (el) {
                 turnToPrevPage();
-                el.classList.remove('go_down', 'turn_page')
-                el.classList.add('hidden');
                 resetAccumulatedDistance();
             })
         } else {
@@ -195,14 +193,15 @@ Pa.prototype.monit = function (element) {
     }
 
 
-    function turnToNextPage(currentPage) {
-        currentPage.classList.remove('go_up', 'turn_page');
-        currentPage.classList.add('hidden');
+    function turnToNextPage() {
+        context.currPage.classList.remove('go_up', 'turn_page');
+        // context.currPage.classList.add('hidden');
 
     }
 
     function turnToPrevPage() {
-
+        context.prevPage.classList.remove('go_down', 'turn_page')
+        // context.prevPage.classList.add('hidden');
     }
 
 }
