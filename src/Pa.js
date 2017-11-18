@@ -62,27 +62,22 @@ Pa.prototype.buildPage = function (data) {
 }
 
 Pa.prototype.monit = function (element) {
-    var context = this
-    var up_pivot = this.up_pivot = document.createElement('div')
-    up_pivot.classList.add('pa_up_pivot')
-    element.insertBefore(up_pivot, element.firstChild)
+    var context = this, pageAtTop = false, pageAtBottom = false;
 
-    var down_pivot = this.down_pivot = document.createElement('div')
-    down_pivot.classList.add('pa_down_pivot')
-    element.appendChild(down_pivot)
-
-    let io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            console.log('see target! ', entry.target, entry.intersectionRatio)
-            entry.target.classList.toggle('pa_visible', entry.intersectionRatio === 1)
-        })
-    }, {
-            root: context.container,
-            threshold: 1
-        });
-
-    io.observe(up_pivot)
-    io.observe(down_pivot)
+    var scrollTicking = false;
+    context.currPage.addEventListener('scroll', function(e){
+        var el = this;
+        if(!scrollTicking){
+            window.requestAnimationFrame(function(){
+                var scrollTop = el.scrollTop, scrollBottom = el.scrollHeight - el.offsetHeight;
+                pageAtTop = scrollTop == 0;
+                pageAtBottom = scrollTop == scrollBottom;
+                console.log('pageAtTop: ' + pageAtTop + ' pageAtBottom: ' + pageAtBottom);
+                scrollTicking = false;
+            })
+        }
+        scrollTicking = true;
+    })
 
     var formerPosition, afterPosition;
     document.addEventListener('touchstart', e => {
@@ -98,14 +93,14 @@ Pa.prototype.monit = function (element) {
 
                 setTurnPage();
 
-                if (context.up_pivot.classList.contains('pa_visible') && isTurnPage) {
+                if (pageAtTop && isTurnPage) {
                     if (determineDirection() == 'down') {
                         console.log('show previous page')
                     } else if (determineDirection() == 'up') {
                         console.log('resume')
                     }
                     context.prevPage.style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
-                } else if (context.down_pivot.classList.contains('pa_visible') && isTurnPage) {
+                } else if (pageAtBottom && isTurnPage) {
                     if (determineDirection() == 'up') {
                         console.log('show next page')
                     } else if (determineDirection() == 'down') {
@@ -121,12 +116,12 @@ Pa.prototype.monit = function (element) {
     })
 
     document.addEventListener('touchend', e => {
-        if (context.down_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() < -100) {
+        if (pageAtBottom && isTurnPage && getAccumulatedDistance() < -100) {
             setClazThen(context.currPage, 'go_up', function (el) {
                 turnToNextPage();
                 resetAccumulatedDistance();
             })
-        } else if (context.up_pivot.classList.contains('pa_visible') && isTurnPage && getAccumulatedDistance() >= 100) {
+        } else if (pageAtTop && isTurnPage && getAccumulatedDistance() >= 100) {
             setClazThen(context.prevPage, 'go_down', function (el) {
                 turnToPrevPage();
                 resetAccumulatedDistance();
@@ -176,8 +171,8 @@ Pa.prototype.monit = function (element) {
             console.log('turnPage setted, return')
             return;
         }
-        if ((context.down_pivot.classList.contains('pa_visible') && determineDirection() == 'up') ||
-            (context.up_pivot.classList.contains('pa_visible') && determineDirection() == 'down')) {
+        if ((pageAtBottom && determineDirection() == 'up') ||
+            (pageAtTop && determineDirection() == 'down')) {
             turnPageSetted = true;
             isTurnPage = true;
             document.querySelector('.current_page').classList.add('turn_page')
