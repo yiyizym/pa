@@ -64,20 +64,8 @@ Pa.prototype.buildPage = function (data) {
 Pa.prototype.monit = function (element) {
     var context = this, pageAtTop = false, pageAtBottom = false;
 
-    var scrollTicking = false;
-    context.currPage.addEventListener('scroll', function(e){
-        var el = this;
-        if(!scrollTicking){
-            window.requestAnimationFrame(function(){
-                var scrollTop = el.scrollTop, scrollBottom = el.scrollHeight - el.offsetHeight;
-                pageAtTop = scrollTop == 0;
-                pageAtBottom = scrollTop == scrollBottom;
-                console.log('pageAtTop: ' + pageAtTop + ' pageAtBottom: ' + pageAtBottom);
-                scrollTicking = false;
-            })
-        }
-        scrollTicking = true;
-    })
+    
+    context.currPage.addEventListener('scroll', determinePosition);
 
     var formerPosition, afterPosition;
     document.addEventListener('touchstart', e => {
@@ -190,13 +178,49 @@ Pa.prototype.monit = function (element) {
 
     function turnToNextPage() {
         context.currPage.classList.remove('go_up', 'turn_page');
-        // context.currPage.classList.add('hidden');
+        context.currPage.style.transform = '';
 
+        context.currPage.removeEventListener('scroll', determinePosition);;
+        
+        // currPage -> next_page, nextPage -> prev_page, prevPage -> current_page
+        var tempRef = context.currPage;
+        context.currPage = context.nextPage;
+        context.nextPage = context.prevPage;
+        context.prevPage = tempRef;
+
+        context.currPage.addEventListener('scroll', determinePosition);
+
+        context.nextPage.classList.remove('prev_page')
+        context.nextPage.classList.add('next_page');
+        context.currPage.classList.remove('next_page')
+        context.currPage.classList.add('current_page');
+        context.prevPage.classList.remove('current_page')
+        context.prevPage.classList.add('prev_page');
+
+        console.log('context previous page\'s class: ', context.prevPage.className);
+        console.log('context current page\'s class: ', context.currPage.className);
+        console.log('context next page\'s class: ', context.nextPage.className);
+        
     }
 
     function turnToPrevPage() {
         context.prevPage.classList.remove('go_down', 'turn_page')
         // context.prevPage.classList.add('hidden');
+    }
+
+    var scrollTicking = false;
+    function determinePosition(e){
+        var _el = this;
+        if(!scrollTicking){
+            window.requestAnimationFrame(function () {
+                var scrollTop = _el.scrollTop, scrollBottom = _el.scrollHeight - _el.offsetHeight;
+                pageAtTop = scrollTop == 0;
+                pageAtBottom = scrollTop == scrollBottom;
+                console.log('pageAtTop: ' + pageAtTop + ' pageAtBottom: ' + pageAtBottom);
+                scrollTicking = false;
+            })
+        }
+        scrollTicking = true;
     }
 
 }
