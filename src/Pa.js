@@ -196,16 +196,31 @@ Pa.prototype.monit = function (element) {
         context.currPage.classList.add('current_page');
         context.prevPage.classList.remove('current_page')
         context.prevPage.classList.add('prev_page');
-
-        console.log('context previous page\'s class: ', context.prevPage.className);
-        console.log('context current page\'s class: ', context.currPage.className);
-        console.log('context next page\'s class: ', context.nextPage.className);
         
     }
 
     function turnToPrevPage() {
         context.prevPage.classList.remove('go_down', 'turn_page')
-        // context.prevPage.classList.add('hidden');
+
+        context.prevPage.style.transform = '';
+
+        context.currPage.removeEventListener('scroll', determinePosition);;
+
+        // currPage -> prev_page, prevPage -> next_page, nextPage -> current_page
+        var tempRef = context.currPage;
+        context.currPage = context.prevPage;
+        context.prevPage = context.nextPage;
+        context.nextPage = tempRef;
+
+        context.currPage.addEventListener('scroll', determinePosition);
+
+        context.nextPage.classList.remove('current_page')
+        context.nextPage.classList.add('next_page');
+        context.currPage.classList.remove('prev_page')
+        context.currPage.classList.add('current_page');
+        context.prevPage.classList.remove('next_page')
+        context.prevPage.classList.add('prev_page');
+
     }
 
     var scrollTicking = false;
