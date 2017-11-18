@@ -1,6 +1,8 @@
 import 'whatwg-fetch'
 import scrollManager from './scrollManager'
 
+const MAX_HEIGHT = 1e5;
+
 const Pa = function (selector, url) {
     if (!(this instanceof Pa)) {
         return new Pa(selector, url)
@@ -56,14 +58,17 @@ Pa.prototype.buildPage = function (data) {
 
 
     this.container.appendChild(prevPage)
+    scrollManager.scrollBy(this.prevPage, MAX_HEIGHT)
     this.container.appendChild(currPage)
     this.container.appendChild(nextPage)
+    scrollManager.scrollBy(this.nextPage, 0)
+
     this.monit(currPage)
 }
 
 Pa.prototype.monit = function (element) {
-    var context = this, pageAtTop = false, pageAtBottom = false;
-
+    var context = this;
+    var currentPageAtTop = true, currentPageAtBottom = false;
     
     context.currPage.addEventListener('scroll', determinePosition);
 
@@ -81,14 +86,14 @@ Pa.prototype.monit = function (element) {
 
                 setTurnPage();
 
-                if (pageAtTop && isTurnPage) {
+                if (currentPageAtTop && isTurnPage) {
                     if (determineDirection() == 'down') {
                         console.log('show previous page')
                     } else if (determineDirection() == 'up') {
                         console.log('resume')
                     }
                     context.prevPage.style.transform = 'translateY(' + Math.max(getAccumulatedDistance(), 0) + 'px)';
-                } else if (pageAtBottom && isTurnPage) {
+                } else if (currentPageAtBottom && isTurnPage) {
                     if (determineDirection() == 'up') {
                         console.log('show next page')
                     } else if (determineDirection() == 'down') {
@@ -104,12 +109,12 @@ Pa.prototype.monit = function (element) {
     })
 
     document.addEventListener('touchend', e => {
-        if (pageAtBottom && isTurnPage && getAccumulatedDistance() < -100) {
+        if (currentPageAtBottom && isTurnPage && getAccumulatedDistance() < -100) {
             setClazThen(context.currPage, 'go_up', function (el) {
                 turnToNextPage();
                 resetAccumulatedDistance();
             })
-        } else if (pageAtTop && isTurnPage && getAccumulatedDistance() >= 100) {
+        } else if (currentPageAtTop && isTurnPage && getAccumulatedDistance() >= 100) {
             setClazThen(context.prevPage, 'go_down', function (el) {
                 turnToPrevPage();
                 resetAccumulatedDistance();
@@ -159,8 +164,8 @@ Pa.prototype.monit = function (element) {
             console.log('turnPage setted, return')
             return;
         }
-        if ((pageAtBottom && determineDirection() == 'up') ||
-            (pageAtTop && determineDirection() == 'down')) {
+        if ((currentPageAtBottom && determineDirection() == 'up') ||
+            (currentPageAtTop && determineDirection() == 'down')) {
             turnPageSetted = true;
             isTurnPage = true;
             document.querySelector('.current_page').classList.add('turn_page')
@@ -188,7 +193,12 @@ Pa.prototype.monit = function (element) {
         context.nextPage = context.prevPage;
         context.prevPage = tempRef;
 
+        currentPageAtTop = true;
+        currentPageAtBottom = false;
+
         context.currPage.addEventListener('scroll', determinePosition);
+        scrollManager.scrollBy(context.prevPage, MAX_HEIGHT);
+        scrollManager.scrollBy(context.nextPage, 0);
 
         context.nextPage.classList.remove('prev_page')
         context.nextPage.classList.add('next_page');
@@ -204,7 +214,10 @@ Pa.prototype.monit = function (element) {
 
         context.prevPage.style.transform = '';
 
-        context.currPage.removeEventListener('scroll', determinePosition);;
+        currentPageAtTop = false;
+        currentPageAtBottom = true;
+
+        context.currPage.removeEventListener('scroll', determinePosition);
 
         // currPage -> prev_page, prevPage -> next_page, nextPage -> current_page
         var tempRef = context.currPage;
@@ -213,6 +226,8 @@ Pa.prototype.monit = function (element) {
         context.nextPage = tempRef;
 
         context.currPage.addEventListener('scroll', determinePosition);
+        scrollManager.scrollBy(context.prevPage, MAX_HEIGHT);
+        scrollManager.scrollBy(context.nextPage, 0);
 
         context.nextPage.classList.remove('current_page')
         context.nextPage.classList.add('next_page');
@@ -229,9 +244,9 @@ Pa.prototype.monit = function (element) {
         if(!scrollTicking){
             window.requestAnimationFrame(function () {
                 var scrollTop = _el.scrollTop, scrollBottom = _el.scrollHeight - _el.offsetHeight;
-                pageAtTop = scrollTop == 0;
-                pageAtBottom = scrollTop == scrollBottom;
-                console.log('pageAtTop: ' + pageAtTop + ' pageAtBottom: ' + pageAtBottom);
+                currentPageAtTop = scrollTop == 0;
+                currentPageAtBottom = scrollTop == scrollBottom;
+                console.log('currentPageAtTop: ' + currentPageAtTop + ' currentPageAtBottom: ' + currentPageAtBottom);
                 scrollTicking = false;
             })
         }
