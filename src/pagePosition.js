@@ -8,19 +8,28 @@ var formerPosition = 0,
     accumulatedDistance = 0;
 
 export default {
-    init() {
+    init(pubSub) {
+        this.pubSub = pubSub;
         document.addEventListener('touchstart', e => {
             formerPosition = e.touches[0].clientY
         })
+        this.detectPosition = this._detectPosition.bind(this);
     },
-    detectPosition() {
-        var _el = this;
+    _detectPosition: function(e){
+        var _el = e.target;
+        var context = this;
         if (!scrollTicking) {
             window.requestAnimationFrame(function () {
                 var scrollTop = _el.scrollTop, scrollBottom = _el.scrollHeight - _el.offsetHeight;
                 currentPageAtTop = scrollTop == 0;
                 currentPageAtBottom = scrollTop == scrollBottom;
                 console.log('currentPageAtTop: ' + currentPageAtTop + ' currentPageAtBottom: ' + currentPageAtBottom);
+                if (currentPageAtTop) {
+                    context.pubSub.publish('position', 'top')
+                }
+                if (currentPageAtBottom) {
+                    context.pubSub.publish('position', 'bottom')
+                }
                 scrollTicking = false;
             })
         }

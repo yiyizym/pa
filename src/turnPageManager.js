@@ -1,5 +1,6 @@
 import constant from './constant'
 import pagePosition from './pagePosition'
+import pubSub from './simplePubsub'
 
 var ticking = false;
 
@@ -12,7 +13,11 @@ export default {
         this.currPage = options.currPage;
         this.nextPage = options.nextPage;
 
-        pagePosition.init()
+        pubSub.subscribe('position', (_, pos) => {
+            console.log('page position: ', pos)
+        })
+
+        pagePosition.init(pubSub)
 
         this.currPage.addEventListener('scroll', pagePosition.detectPosition);
 
