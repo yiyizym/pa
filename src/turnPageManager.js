@@ -6,6 +6,8 @@ var ticking = false;
 export default {
     init(options) {
 
+        this.dataManager = options.dataManager;
+
         this.prevPage = options.prevPage;
         this.currPage = options.currPage;
         this.nextPage = options.nextPage;
