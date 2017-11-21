@@ -11,12 +11,14 @@ http.createServer((req, res)=>{
 
     var list = [];
 
-    for (var i = 0; i < pageSize && (page + i) < total; i++){
+    for (var i = 0; i < pageSize && (page * pageSize + i) < total; i++){
         list.push({
-            value: page + i,
-            id: page + i
+            value: page * pageSize + i,
+            id: page * pageSize + i
         })
     }
+
+    console.log('list: ', list)
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Request-Method', '*');
@@ -27,7 +29,7 @@ http.createServer((req, res)=>{
         res.end();
         return;
     }
-    
+
     res.setHeader('Content-Type', 'application/json');
     res.writeHead(200);
     res.end(JSON.stringify({

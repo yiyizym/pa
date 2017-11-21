@@ -28,20 +28,20 @@ Pa.prototype.buildPage = function (data) {
 
     let prevPage = this.prevPage = document.createElement('ul')
     prevPage.classList.add('prev_page')
-    
+
 
     let currPage = this.currPage = document.createElement('ul')
     currPage.classList.add('current_page')
     data['list'].forEach(item => {
         let li = document.createElement('li')
-        li.textContent = Number(item.value) + 10
-        li.setAttribute('id', Number(item.id) + 10)
+        li.textContent = Number(item.value)
+        li.setAttribute('id', Number(item.id))
         currPage.appendChild(li)
     })
 
     let nextPage = this.nextPage = document.createElement('ul')
     nextPage.classList.add('next_page')
-    
+
 
     this.container.appendChild(prevPage)
     this.prevPage.scrollTop = constant.MAX_HEIGHT;

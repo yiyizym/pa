@@ -12,13 +12,18 @@ export default {
     },
 
     fetchFirstPage(){
-        return this.fetchNextPage()
+        return this.fetchNextPage().then((data)=> {
+            this.increasePage();
+            return data;
+        });
     },
 
     fetchNextPage(){
         if(this.dataMap[page]){
+            console.log('fetchNextPage, using cached data, current page: ', page)
             return Promise.resolve(this.dataMap[page]);
         }
+        console.log('fetchNextPage, using server data, current page: ', page)
         return axios.get(this.url, {
             params: {
                 page: page,
@@ -38,8 +43,10 @@ export default {
 
     fetchPrevPage(){
         if (this.dataMap[page]) {
+            console.log('fetchPrevPage, using cached data, current page: ', page)
             return Promise.resolve(this.dataMap[page]);
         }
+        console.log('fetchPrevPage, using server data, current page: ', page)
         return axios.get(this.url, {
             params: {
                 page: page,
@@ -62,7 +69,7 @@ export default {
         page = page >= maxPage ? page : page + 1;
     },
     decreasePage(){
-        page = page <= 0 ? 0 : page - 1; 
+        page = page <= 0 ? 0 : page - 1;
     }
 
 }
