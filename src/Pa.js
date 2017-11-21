@@ -28,12 +28,7 @@ Pa.prototype.buildPage = function (data) {
 
     let prevPage = this.prevPage = document.createElement('ul')
     prevPage.classList.add('prev_page')
-    // data['list'].forEach(item => {
-    //     let li = document.createElement('li')
-    //     li.textContent = item.value
-    //     li.setAttribute('id', item.id)
-    //     prevPage.appendChild(li)
-    // })
+    
 
     let currPage = this.currPage = document.createElement('ul')
     currPage.classList.add('current_page')
@@ -46,12 +41,7 @@ Pa.prototype.buildPage = function (data) {
 
     let nextPage = this.nextPage = document.createElement('ul')
     nextPage.classList.add('next_page')
-    // data['list'].forEach(item => {
-    //     let li = document.createElement('li')
-    //     li.textContent = Number(item.value) + 20
-    //     li.setAttribute('id', Number(item.id) + 20)
-    //     nextPage.appendChild(li)
-    // })
+    
 
     this.container.appendChild(prevPage)
     this.prevPage.scrollTop = constant.MAX_HEIGHT;

@@ -16,6 +16,9 @@ export default {
     },
 
     fetchNextPage(){
+        if(this.dataMap[page]){
+            return Promise.resolve(this.dataMap[page]);
+        }
         return axios.get(this.url, {
             params: {
                 page: page,
@@ -25,7 +28,7 @@ export default {
                 data = JSON.parse(data);
                 total = data.total;
                 maxPage = Math.ceil(total / pageSize);
-                page = page >= maxPage ? page : page + 1;
+                this.dataMap[page] = data;
                 return data;
             }]
         }).then((resp)=>{
@@ -34,19 +37,32 @@ export default {
     },
 
     fetchPrevPage(){
-        // return axios.get(this.url, {
-        //     params: {
-        //         page: page,
-        //         pageSize: pageSize
-        //     },
-        //     transformResponse: [(resp) => {
-        //         if (resp.status == 200) {
-        //             total = resp.data.total;
-        //             maxPage = Math.ceil(total / pageSize);
-        //             page = page >= maxPage ? page : page + 1;
-        //             return resp.data;
-        //         }
-        //     }]
-        // })
+        if (this.dataMap[page]) {
+            return Promise.resolve(this.dataMap[page]);
+        }
+        return axios.get(this.url, {
+            params: {
+                page: page,
+                pageSize: pageSize
+            },
+            transformResponse: [(resp) => {
+                if (resp.status == 200) {
+                    total = resp.data.total;
+                    maxPage = Math.ceil(total / pageSize);
+                    this.dataMap[page] = data;
+                    return resp.data;
+                }
+            }]
+        }).then((resp) => {
+            return resp.data;
+        })
+    },
+
+    increasePage(){
+        page = page >= maxPage ? page : page + 1;
+    },
+    decreasePage(){
+        page = page <= 0 ? 0 : page - 1; 
     }
+
 }
