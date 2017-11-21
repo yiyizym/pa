@@ -18,6 +18,9 @@ export default {
             switch (pos) {
                 case 'top':
                     this.dataManager.fetchPrevPage().then((data) => {
+                        if (!data['list']) {
+                            return;
+                        }
                         this.prevPage.innerHTML = '';
                         data['list'].forEach(item => {
                             let li = document.createElement('li')
@@ -29,16 +32,19 @@ export default {
                     break;
                 case 'bottom':
                     this.dataManager.fetchNextPage().then((data) => {
+                        if (!data['list']){
+                            return;
+                        }
                         this.nextPage.innerHTML = '';
                         data['list'].forEach(item => {
                             let li = document.createElement('li')
-                            li.textContent = Number(item.value) + 20
-                            li.setAttribute('id', Number(item.id) + 20)
+                            li.textContent = Number(item.value)
+                            li.setAttribute('id', Number(item.id))
                             this.nextPage.appendChild(li)
                         })
                     })
                     break;
-            
+
                 default:
                     break;
             }

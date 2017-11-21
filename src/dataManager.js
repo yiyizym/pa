@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-var page = 0;
+var page = -1;
 var maxPage = 0;
 var pageSize = 10;
 var total;
@@ -13,27 +13,34 @@ export default {
 
     fetchFirstPage(){
         return this.fetchNextPage().then((data)=> {
+            console.log('first page data: ', data)
             this.increasePage();
             return data;
         });
     },
 
     fetchNextPage(){
-        if(this.dataMap[page]){
-            console.log('fetchNextPage, using cached data, current page: ', page)
-            return Promise.resolve(this.dataMap[page]);
+        console.log('fetchNextPage, currentPage: ', page);
+        if(maxPage != 0 && page >= maxPage){
+            console.log('reach max page, will not fetch next page');
+            return Promise.resolve({});
         }
-        console.log('fetchNextPage, using server data, current page: ', page)
+        var nextPageCount = page + 1;
+        if (this.dataMap[nextPageCount]){
+            console.log('fetchNextPage: ' + nextPageCount + ', using cached data.')
+            return Promise.resolve(this.dataMap[nextPageCount]);
+        }
+        console.log('fetchNextPage: ' + nextPageCount + ', using server data.')
         return axios.get(this.url, {
             params: {
-                page: page,
+                page: nextPageCount,
                 pageSize: pageSize
             },
             transformResponse: [(data) => {
                 data = JSON.parse(data);
                 total = data.total;
                 maxPage = Math.ceil(total / pageSize);
-                this.dataMap[page] = data;
+                this.dataMap[nextPageCount] = data;
                 return data;
             }]
         }).then((resp)=>{
@@ -42,21 +49,27 @@ export default {
     },
 
     fetchPrevPage(){
-        if (this.dataMap[page]) {
-            console.log('fetchPrevPage, using cached data, current page: ', page)
-            return Promise.resolve(this.dataMap[page]);
+        console.log('fetchNextPage, currentPage: ', page);
+        if (page == 0) {
+            console.log('reach first page, will not fetch previous page');
+            return Promise.resolve({});
         }
-        console.log('fetchPrevPage, using server data, current page: ', page)
+        var nextPageCount = page - 1;
+        if (this.dataMap[nextPageCount]) {
+            console.log('fetchPrevPage: ' + nextPageCount + ', using cached data.')
+            return Promise.resolve(this.dataMap[nextPageCount]);
+        }
+        console.log('fetchPrevPage: ' + nextPageCount + ', using server data.')
         return axios.get(this.url, {
             params: {
-                page: page,
+                page: nextPageCount,
                 pageSize: pageSize
             },
             transformResponse: [(resp) => {
                 if (resp.status == 200) {
                     total = resp.data.total;
                     maxPage = Math.ceil(total / pageSize);
-                    this.dataMap[page] = data;
+                    this.dataMap[nextPageCount] = data;
                     return resp.data;
                 }
             }]
