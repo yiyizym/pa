@@ -67,9 +67,9 @@ export default {
 
                     pagePosition.logPosition(e)
 
-                    if (pagePosition.turningPrev()) {
+                    if (pagePosition.turningPrev() && !manager.dataManager.isFirstPage()) {
                         manager.prevPage.style.transform = 'translateY(' + Math.max(pagePosition.getAccumulatedDistance(), 0) + 'px)';
-                    } else if (pagePosition.turningNext()) {
+                    } else if (pagePosition.turningNext() && !manager.dataManager.isLastPage()) {
                         manager.currPage.style.transform = 'translateY(' + Math.min(pagePosition.getAccumulatedDistance(), 0) + 'px)';
                     }
                     pagePosition.updatePosition()
@@ -82,13 +82,13 @@ export default {
     setTurnedPageCb() {
         var manager = this;
         document.addEventListener('touchend', e => {
-            if (pagePosition.shouldTurnPrev()) {
-                manager.setClazThen(manager.currPage, 'go_up', function () {
-                    manager.turnToNextPage();
-                })
-            } else if (pagePosition.shouldTurnNext()) {
+            if (pagePosition.shouldTurnPrev() && !manager.dataManager.isFirstPage()) {
                 manager.setClazThen(manager.prevPage, 'go_down', function () {
                     manager.turnToPrevPage();
+                })
+            } else if (pagePosition.shouldTurnNext() && !manager.dataManager.isLastPage()) {
+                manager.setClazThen(manager.currPage, 'go_up', function () {
+                    manager.turnToNextPage();
                 })
             } else {
                 manager.currPage.style.transform = 'translateY(0%)';

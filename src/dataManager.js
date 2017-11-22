@@ -83,6 +83,14 @@ export default {
     },
     decreasePage(){
         page = page <= 0 ? 0 : page - 1;
+    },
+
+    isFirstPage(){
+        return page == 0;
+    },
+
+    isLastPage(){
+        return page == maxPage;
     }
 
 }

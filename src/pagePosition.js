@@ -56,11 +56,11 @@ export default {
     },
 
     shouldTurnPrev() {
-        return currentPageAtBottom && isTurnPage && this.getAccumulatedDistance() < -100
+        return this.turningPrev() && this.getAccumulatedDistance() > 100;
     },
 
     shouldTurnNext() {
-        return currentPageAtTop && isTurnPage && this.getAccumulatedDistance() >= 100;
+        return this.turningNext() && this.getAccumulatedDistance() < -100;
     },
 
     determineDirection() {
