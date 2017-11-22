@@ -92,6 +92,30 @@
                 transform: translate3d(0, 100%, 0);
             }
         }
+
+        .reset_up {
+            animation: reset_up 0.2s ease-in-out;
+            animation-fill-mode: forwards;
+            overflow: hidden;
+        }
+
+        @keyframes reset_up {
+            100% {
+                transform: translate3d(0, 0%, 0);
+            }
+        }
+
+        .reset_down {
+            animation: reset_down 0.2s ease-in-out;
+            animation-fill-mode: forwards;
+            overflow: hidden;
+        }
+
+        @keyframes reset_down {
+            100% {
+                transform: translate3d(0, 0%, 0);
+            }
+        }
     </style>
 </head>
 

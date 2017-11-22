@@ -90,8 +90,16 @@ export default {
                 manager.setClazThen(manager.currPage, 'go_up', function () {
                     manager.turnToNextPage();
                 })
-            } else {
-                manager.currPage.style.transform = 'translateY(0%)';
+            } else if(pagePosition.turningPrev()){
+                manager.setClazThen(manager.prevPage, 'reset_up', function () {
+                    manager.prevPage.classList.remove('reset_up');
+                    manager.prevPage.style.transform = 'translateY(0%)';
+                })
+            } else if (pagePosition.turningNext()){
+                manager.setClazThen(manager.currPage, 'reset_down', function () {
+                    manager.currPage.classList.remove('reset_down');
+                    manager.currPage.style.transform = 'translateY(0%)';
+                })
             }
             pagePosition.reset()
         })

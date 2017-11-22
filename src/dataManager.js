@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 var page = -1;
-var maxPage = 0;
+var maxPage = null;
 var pageSize = 10;
 var total;
 
@@ -13,7 +13,6 @@ export default {
 
     fetchFirstPage(){
         return this.fetchNextPage().then((data)=> {
-            console.log('first page data: ', data)
             this.increasePage();
             return data;
         });
@@ -21,7 +20,7 @@ export default {
 
     fetchNextPage(){
         console.log('fetchNextPage, currentPage: ', page);
-        if(maxPage != 0 && page >= maxPage){
+        if(maxPage !== null && page >= maxPage){
             console.log('reach max page, will not fetch next page');
             return Promise.resolve({});
         }
@@ -39,7 +38,7 @@ export default {
             transformResponse: [(data) => {
                 data = JSON.parse(data);
                 total = data.total;
-                maxPage = Math.ceil(total / pageSize);
+                maxPage = Math.ceil(total / pageSize) - 1;
                 this.dataMap[nextPageCount] = data;
                 return data;
             }]
@@ -68,7 +67,7 @@ export default {
             transformResponse: [(resp) => {
                 if (resp.status == 200) {
                     total = resp.data.total;
-                    maxPage = Math.ceil(total / pageSize);
+                    maxPage = Math.ceil(total / pageSize) - 1;
                     this.dataMap[nextPageCount] = data;
                     return resp.data;
                 }
@@ -90,6 +89,7 @@ export default {
     },
 
     isLastPage(){
+        console.log('isLastPage: ', page, maxPage);
         return page == maxPage;
     }
 
