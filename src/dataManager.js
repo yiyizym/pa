@@ -91,6 +91,10 @@ export default {
     isLastPage(){
         console.log('isLastPage: ', page, maxPage);
         return page == maxPage;
+    },
+
+    getCurrPage(){
+        return page;
     }
 
 }

@@ -69,8 +69,10 @@ export default {
 
                     if (pagePosition.turningPrev() && !manager.dataManager.isFirstPage()) {
                         manager.prevPage.style.transform = 'translateY(' + Math.max(pagePosition.getAccumulatedDistance(), 0) + 'px)';
+                        manager.setPageHint('prev')
                     } else if (pagePosition.turningNext() && !manager.dataManager.isLastPage()) {
                         manager.currPage.style.transform = 'translateY(' + Math.min(pagePosition.getAccumulatedDistance(), 0) + 'px)';
+                        manager.setPageHint('next')
                     }
                     pagePosition.updatePosition()
                     ticking = false;
@@ -101,7 +103,8 @@ export default {
                     manager.currPage.style.transform = 'translateY(0%)';
                 })
             }
-            pagePosition.reset()
+            manager.resetPageHint();
+            pagePosition.reset();
         })
     },
 
@@ -170,5 +173,31 @@ export default {
                 cb && cb(el);
             }, latency);
         }
-    })()
+    })(),
+    
+    setPageHint(to){
+        switch (to) {
+            case 'next':
+                setPageHint(this.nextPage, `下翻至 ${this.dataManager.getCurrPage() + 1} 页`);
+                break;
+            case 'prev':
+                setPageHint(this.currPage, `上翻至 ${this.dataManager.getCurrPage() - 1} 页`);
+                break;
+            default:
+                break;
+        }
+
+        function setPageHint(el, hint){
+            el.classList.add('show_page_hint');
+            el.dataset.hint = hint;
+        }
+    },
+
+    resetPageHint(){
+        console.log('resetPageHint');
+        [this.currPage, this.prevPage, this.nextPage].map(el => {
+            el.classList.remove('show_page_hint');
+            el.dataset.hint = null;
+        })
+    }
 }
