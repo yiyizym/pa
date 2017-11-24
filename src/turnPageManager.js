@@ -15,32 +15,55 @@ export default {
 
         pubSub.subscribe('position', (_, pos) => {
             console.log('page position: ', pos)
+            var currentPage;
+            var targetPage;
             switch (pos) {
                 case 'top':
+                    if (this.dataManager.isFetchingPrevPage()) {
+                        console.log('fetching prev page.')
+                        return;
+                    }
+                    currentPage = this.dataManager.getCurrPage();
                     this.dataManager.fetchPrevPage().then((data) => {
                         if (!data['list']) {
                             return;
                         }
-                        this.prevPage.innerHTML = '';
+                        if (currentPage == this.dataManager.getCurrPage()) {
+                            targetPage = this.prevPage;
+                        } else if (currentPage == this.dataManager.getCurrPage() + 1) {
+                            targetPage = this.currPage;
+                        }
+                        targetPage.innerHTML = '';
                         data['list'].forEach(item => {
                             let li = document.createElement('li')
                             li.textContent = item.value
                             li.setAttribute('id', item.id)
-                            this.prevPage.appendChild(li)
+                            targetPage.appendChild(li)
                         })
                     })
                     break;
                 case 'bottom':
+                    if (this.dataManager.isFetchingNextPage()){
+                        console.log('fetching next page.')
+                        return;
+                    }
+                    currentPage = this.dataManager.getCurrPage();
                     this.dataManager.fetchNextPage().then((data) => {
                         if (!data['list']){
                             return;
                         }
-                        this.nextPage.innerHTML = '';
+                        
+                        if(currentPage == this.dataManager.getCurrPage()){
+                            targetPage = this.nextPage;
+                        } else if (currentPage == this.dataManager.getCurrPage() - 1){
+                            targetPage = this.currPage;
+                        }
+                        targetPage.innerHTML = '';
                         data['list'].forEach(item => {
                             let li = document.createElement('li')
                             li.textContent = Number(item.value)
                             li.setAttribute('id', Number(item.id))
-                            this.nextPage.appendChild(li)
+                            targetPage.appendChild(li)
                         })
                     })
                     break;
@@ -176,6 +199,7 @@ export default {
     })(),
     
     setPageHint(to){
+        console.log('setPageHint')
         switch (to) {
             case 'next':
                 setPageHint(this.nextPage, `下翻至 ${this.dataManager.getCurrPage() + 1} 页`);
@@ -197,7 +221,7 @@ export default {
         console.log('resetPageHint');
         [this.currPage, this.prevPage, this.nextPage].map(el => {
             el.classList.remove('show_page_hint');
-            el.dataset.hint = null;
+            delete el.dataset.hint;
         })
     }
 }

@@ -4,6 +4,7 @@ var page = -1;
 var maxPage = null;
 var pageSize = 10;
 var total;
+var isFetchingNextPage, isFetchingPrevPage;
 
 export default {
     init(option){
@@ -30,6 +31,7 @@ export default {
             return Promise.resolve(this.dataMap[nextPageCount]);
         }
         console.log('fetchNextPage: ' + nextPageCount + ', using server data.')
+        isFetchingNextPage = true;
         return axios.get(this.url, {
             params: {
                 page: nextPageCount,
@@ -43,6 +45,8 @@ export default {
                 return data;
             }]
         }).then((resp)=>{
+            isFetchingNextPage = false;
+            console.log('got next page data.');
             return resp.data;
         })
     },
@@ -59,6 +63,7 @@ export default {
             return Promise.resolve(this.dataMap[nextPageCount]);
         }
         console.log('fetchPrevPage: ' + nextPageCount + ', using server data.')
+        isFetchingPrevPage = true;
         return axios.get(this.url, {
             params: {
                 page: nextPageCount,
@@ -73,6 +78,8 @@ export default {
                 }
             }]
         }).then((resp) => {
+            isFetchingPrevPage = false;
+            console.log('got prev page data.');
             return resp.data;
         })
     },
@@ -95,6 +102,13 @@ export default {
 
     getCurrPage(){
         return page;
+    },
+
+    isFetchingPrevPage(){
+
+    },
+    isFetchingNextPage() {
+
     }
 
 }
