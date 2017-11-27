@@ -1,6 +1,7 @@
 import constant from './constant'
 import turnPageManager from './turnPageManager'
 import dataManager from './dataManager'
+import util from './util'
 
 const Pa = function (selector, url) {
     if (!(this instanceof Pa)) {
@@ -21,7 +22,9 @@ const Pa = function (selector, url) {
             currPage: this.currPage,
             nextPage: this.nextPage
         })
-    })
+    });
+
+    util.preventChromePullRefresh();
 }
 
 Pa.prototype.buildPage = function (data) {
