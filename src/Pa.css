@@ -52,12 +52,6 @@ li {
     background-color: rgba(37, 14, 240, 1)
 }
 
-.pa_up_pivot,
-.pa_down_pivot {
-    height: 1px;
-    background: green;
-}
-
 .turn_page {
     overflow: hidden;
 }

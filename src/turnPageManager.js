@@ -210,10 +210,10 @@ export default {
         console.log('setPageHint')
         switch (to) {
             case 'next':
-                setPageHint(this.nextPage, `下翻至 ${this.dataManager.getCurrPage() + 1} 页`);
+                setPageHint(this.nextPage, `下翻至 ${this.dataManager.getCurrPage() + 2} 页`);
                 break;
             case 'prev':
-                setPageHint(this.currPage, `上翻至 ${this.dataManager.getCurrPage() - 1} 页`);
+                setPageHint(this.currPage, `上翻至 ${this.dataManager.getCurrPage()} 页`);
                 break;
             default:
                 break;
