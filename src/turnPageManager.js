@@ -87,7 +87,12 @@ export default {
         document.addEventListener('touchmove', e => {
             if (!ticking) {
                 window.requestAnimationFrame(function () {
-
+                    
+                    // 有时候这个回调会在 touchend 之后再被调用，所以要有个标记位区分一下
+                    if (pagePosition.isReseted()){
+                        return;
+                    }
+                    console.log('touchmove')
                     pagePosition.logPosition(e)
 
                     if (pagePosition.turningPrev() && !manager.dataManager.isFirstPage()) {
@@ -107,6 +112,7 @@ export default {
     setTurnedPageCb() {
         var manager = this;
         document.addEventListener('touchend', e => {
+            console.log('touchend');
             if (pagePosition.shouldTurnPrev() && !manager.dataManager.isFirstPage()) {
                 manager.setClazThen(manager.prevPage, 'go_down', function () {
                     manager.turnToPrevPage();

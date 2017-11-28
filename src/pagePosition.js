@@ -5,13 +5,15 @@ var formerPosition = 0,
     turnPageSetted = false,
     isTurnPage = false,
     scrollTicking = false,
+    reseted = false,
     accumulatedDistance = 0;
 
 export default {
     init(pubSub) {
         this.pubSub = pubSub;
         document.addEventListener('touchstart', e => {
-            formerPosition = e.touches[0].clientY
+            reseted = false;
+            formerPosition = e.touches[0].clientY;
         })
         this.detectPosition = this._detectPosition.bind(this);
     },
@@ -81,8 +83,14 @@ export default {
     },
 
     reset() {
+        console.log('reset pagePosition')
+        reseted = true;
         accumulatedDistance = 0;
         isTurnPage = false;
+    },
+
+    isReseted(){
+        return reseted;
     },
 
     setBottom() {
