@@ -3,6 +3,8 @@ import turnPageManager from './turnPageManager'
 import dataManager from './dataManager'
 import util from './util'
 
+require('./Pa.css')
+
 const Pa = function (selector, url) {
     if (!(this instanceof Pa)) {
         return new Pa(selector, url)
