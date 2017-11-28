@@ -13,6 +13,7 @@ export default {
         this.pubSub = pubSub;
         document.addEventListener('touchstart', e => {
             reseted = false;
+            console.log('touchstart set reseted: ', reseted)
             formerPosition = e.touches[0].clientY;
         })
         this.detectPosition = this._detectPosition.bind(this);

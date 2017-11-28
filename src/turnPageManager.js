@@ -52,7 +52,7 @@ export default {
                         if (!data['list']){
                             return;
                         }
-                        
+
                         if(currentPage == this.dataManager.getCurrPage()){
                             targetPage = this.nextPage;
                         } else if (currentPage == this.dataManager.getCurrPage() - 1){
@@ -87,9 +87,12 @@ export default {
         document.addEventListener('touchmove', e => {
             if (!ticking) {
                 window.requestAnimationFrame(function () {
-                    
+
+                    ticking = false;
+
                     // 有时候这个回调会在 touchend 之后再被调用，所以要有个标记位区分一下
                     if (pagePosition.isReseted()){
+                        console.log('pagePosition isReseted, not handle touchmove')
                         return;
                     }
                     console.log('touchmove')
@@ -103,7 +106,6 @@ export default {
                         manager.setPageHint('next')
                     }
                     pagePosition.updatePosition()
-                    ticking = false;
                 });
             }
             ticking = true;
@@ -203,7 +205,7 @@ export default {
             }, latency);
         }
     })(),
-    
+
     setPageHint(to){
         console.log('setPageHint')
         switch (to) {

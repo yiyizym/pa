@@ -26,7 +26,7 @@ const Pa = function (selector, url) {
         })
     });
 
-    util.preventChromePullRefresh();
+    // util.preventChromePullRefresh();
 }
 
 Pa.prototype.buildPage = function (data) {
