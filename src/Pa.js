@@ -5,15 +5,15 @@ import util from './util'
 
 require('./Pa.css')
 
-const Pa = function (selector, url) {
+const Pa = function (options) {
     if (!(this instanceof Pa)) {
-        return new Pa(selector, url)
+        return new Pa(selector, options.url)
     }
-    this.container = document.querySelector(selector) || document.createElement('div')
+    this.container = document.querySelector(options.selector) || document.createElement('div')
     this.container.classList.add('pa_container')
 
     dataManager.init({
-        url: url
+        url: options.url
     });
 
     dataManager.fetchFirstPage().then((data) => {
