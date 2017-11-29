@@ -33,6 +33,7 @@ export default {
                         } else if (currentPage == this.dataManager.getCurrPage() + 1) {
                             targetPage = this.currPage;
                         }
+                        targetPage.classList.remove('loading');
                         targetPage.innerHTML = '';
                         data['list'].forEach(item => {
                             let li = document.createElement('li')
@@ -58,6 +59,7 @@ export default {
                         } else if (currentPage == this.dataManager.getCurrPage() - 1){
                             targetPage = this.currPage;
                         }
+                        targetPage.classList.remove('loading');
                         targetPage.innerHTML = '';
                         data['list'].forEach(item => {
                             let li = document.createElement('li')
@@ -155,8 +157,10 @@ export default {
         this.dataManager.increasePage();
 
         this.currPage.addEventListener('scroll', pagePosition.detectPosition);
+        this.setLoading();
         this.prevPage.scrollTop = constant.MAX_HEIGHT;
         this.nextPage.scrollTop = 0;
+
 
         this.nextPage.classList.remove('prev_page')
         this.nextPage.classList.add('next_page');
@@ -184,8 +188,10 @@ export default {
         this.nextPage = tempRef;
 
         this.currPage.addEventListener('scroll', pagePosition.detectPosition);
+        this.setLoading();
         this.prevPage.scrollTop = constant.MAX_HEIGHT;
         this.nextPage.scrollTop = 0;
+
 
         this.nextPage.classList.remove('current_page')
         this.nextPage.classList.add('next_page');
@@ -194,6 +200,12 @@ export default {
         this.prevPage.classList.remove('next_page')
         this.prevPage.classList.add('prev_page');
 
+    },
+
+    setLoading(){
+        if (this.dataManager.isFetchingPrevPage() || this.dataManager.isFetchingNextPage()){
+            this.currPage.classList.add('loading');
+        }
     },
 
     setClazThen: (function () {
