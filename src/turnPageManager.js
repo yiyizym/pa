@@ -85,7 +85,8 @@ export default {
 
     },
     setTurningPageCb() {
-        var manager = this;
+        var manager = this,
+            opacity, distance;
         document.addEventListener('touchmove', e => {
             if (!ticking) {
                 window.requestAnimationFrame(function () {
@@ -100,12 +101,15 @@ export default {
                     console.log('touchmove')
                     pagePosition.logPosition(e)
 
+                    distance = pagePosition.getAccumulatedDistance();
                     if (pagePosition.turningPrev() && !manager.dataManager.isFirstPage()) {
-                        manager.prevPage.style.transform = 'translateY(' + Math.max(pagePosition.getAccumulatedDistance(), 0) + 'px)';
-                        manager.setPageHint('prev')
+                        manager.prevPage.style.transform = 'translateY(' + Math.max(distance, 0) + 'px)';
+                        opacity = Math.min(Math.abs(distance / 200), 0.8);
+                        manager.setPageHint('prev', opacity)
                     } else if (pagePosition.turningNext() && !manager.dataManager.isLastPage()) {
-                        manager.currPage.style.transform = 'translateY(' + Math.min(pagePosition.getAccumulatedDistance(), 0) + 'px)';
-                        manager.setPageHint('next')
+                        manager.currPage.style.transform = 'translateY(' + Math.min(distance, 0) + 'px)';
+                        opacity = Math.max(1 - Math.abs(distance / 200), 0.2);
+                        manager.setPageHint('next', opacity)
                     }
                     pagePosition.updatePosition()
                 });
@@ -218,7 +222,7 @@ export default {
         }
     })(),
 
-    setPageHint(to){
+    setPageHint(to, opacity){
         console.log('setPageHint')
         switch (to) {
             case 'next':
@@ -234,6 +238,7 @@ export default {
         function setPageHint(el, hint){
             el.classList.add('show_page_hint');
             el.dataset.hint = hint;
+            el.style.opacity = opacity;
         }
     },
 
@@ -242,6 +247,7 @@ export default {
         [this.currPage, this.prevPage, this.nextPage].map(el => {
             el.classList.remove('show_page_hint');
             delete el.dataset.hint;
+            el.style.opacity = 1;
         })
     }
 }

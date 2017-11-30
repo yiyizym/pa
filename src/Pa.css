@@ -117,7 +117,7 @@ li {
     justify-content: center;
     align-items: flex-end;
     color: #fff;
-    background-color: rgba(0, 0, 0, .2);
+    background-color: rgb(0, 0, 0);
 }
 
 .loading::before {
