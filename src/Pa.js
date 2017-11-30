@@ -7,7 +7,7 @@ require('./Pa.css')
 
 const Pa = function (options) {
     if (!(this instanceof Pa)) {
-        return new Pa(selector, options.url)
+        return new Pa(options)
     }
     this.container = document.querySelector(options.selector) || document.createElement('div')
     this.container.classList.add('pa_container')
