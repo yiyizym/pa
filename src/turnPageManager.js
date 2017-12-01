@@ -8,6 +8,8 @@ export default {
     init(options) {
 
         this.dataManager = options.dataManager;
+        this.itemAdapter = options.itemAdapter;
+        this.dataAdapter = options.dataAdapter;
 
         this.prevPage = options.prevPage;
         this.currPage = options.currPage;
@@ -37,8 +39,7 @@ export default {
                         targetPage.innerHTML = '';
                         data['list'].forEach(item => {
                             let li = document.createElement('li')
-                            li.textContent = item.value
-                            li.setAttribute('id', item.id)
+                            li.appendChild(this.itemAdapter(item))
                             targetPage.appendChild(li)
                         })
                     })
@@ -63,8 +64,7 @@ export default {
                         targetPage.innerHTML = '';
                         data['list'].forEach(item => {
                             let li = document.createElement('li')
-                            li.textContent = Number(item.value)
-                            li.setAttribute('id', Number(item.id))
+                            li.appendChild(this.itemAdapter(item))
                             targetPage.appendChild(li)
                         })
                     })

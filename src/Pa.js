@@ -1,7 +1,7 @@
 import constant from './constant'
 import turnPageManager from './turnPageManager'
 import dataManager from './dataManager'
-import util from './util'
+import _ from 'lodash'
 
 require('./Pa.css')
 
@@ -9,16 +9,30 @@ const Pa = function (options) {
     if (!(this instanceof Pa)) {
         return new Pa(options)
     }
-    this.container = document.querySelector(options.selector) || document.createElement('div')
+    this.options = _.extend({
+        itemAdapter: function(item){
+            var dom = document.createElement('div');
+            dom.setAttribute('id', item.id);
+            dom.textContent = item.value;
+            return dom;
+        },
+        dataAdapter: function(data){
+            return data;
+        }
+    },options);
+    console.log(this.options);
+    this.container = document.querySelector(this.options.selector) || document.createElement('div')
     this.container.classList.add('pa_container')
 
     dataManager.init({
-        url: options.url
+        url: this.options.url
     });
 
     dataManager.fetchFirstPage().then((data) => {
-        this.buildPage(data);
+        this.buildPage(this.options.dataAdapter(data));
         turnPageManager.init({
+            itemAdapter: this.options.itemAdapter,
+            dataAdapter: this.options.dataAdapter,
             dataManager: dataManager,
             prevPage: this.prevPage,
             currPage: this.currPage,
@@ -38,9 +52,8 @@ Pa.prototype.buildPage = function (data) {
     currPage.classList.add('current_page')
     data['list'].forEach(item => {
         let li = document.createElement('li')
-        li.textContent = Number(item.value)
-        li.setAttribute('id', Number(item.id))
-        currPage.appendChild(li)
+        li.appendChild(this.options.itemAdapter(item));
+        currPage.appendChild(li);
     })
 
     let nextPage = this.nextPage = document.createElement('ul')
