@@ -7,13 +7,13 @@ var ticking = false;
 export default {
     init(options) {
 
-        this.dataManager = options.dataManager;
-        this.itemAdapter = options.itemAdapter;
-        this.dataAdapter = options.dataAdapter;
+        this.paginator = options.paginator;
 
-        this.prevPage = options.prevPage;
-        this.currPage = options.currPage;
-        this.nextPage = options.nextPage;
+        this.dataManager = options.dataManager;
+
+        this.prevPage = this.paginator.options.prevPage;
+        this.currPage = this.paginator.options.currPage;
+        this.nextPage = this.paginator.options.nextPage;
 
         pubSub.subscribe('position', (_, pos) => {
             console.log('page position: ', pos)
@@ -35,13 +35,7 @@ export default {
                         } else if (currentPage == this.dataManager.getCurrPage() + 1) {
                             targetPage = this.currPage;
                         }
-                        targetPage.classList.remove('loading');
-                        targetPage.innerHTML = '';
-                        data['list'].forEach(item => {
-                            let li = document.createElement('li')
-                            li.appendChild(this.itemAdapter(item))
-                            targetPage.appendChild(li)
-                        })
+                        this.paginator.buildPage(targetPage, data);
                     })
                     break;
                 case 'bottom':
@@ -60,13 +54,7 @@ export default {
                         } else if (currentPage == this.dataManager.getCurrPage() - 1){
                             targetPage = this.currPage;
                         }
-                        targetPage.classList.remove('loading');
-                        targetPage.innerHTML = '';
-                        data['list'].forEach(item => {
-                            let li = document.createElement('li')
-                            li.appendChild(this.itemAdapter(item))
-                            targetPage.appendChild(li)
-                        })
+                        this.paginator.buildPage(targetPage, data);
                     })
                     break;
 

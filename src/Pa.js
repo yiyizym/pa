@@ -29,32 +29,24 @@ const Pa = function (options) {
     });
 
     dataManager.fetchFirstPage().then((data) => {
-        this.buildPage(this.options.dataAdapter(data));
+        this.buildPages(data);
         turnPageManager.init({
-            itemAdapter: this.options.itemAdapter,
-            dataAdapter: this.options.dataAdapter,
-            dataManager: dataManager,
-            prevPage: this.prevPage,
-            currPage: this.currPage,
-            nextPage: this.nextPage
+            paginator: this,
+            dataManager: dataManager
         })
     });
 
 }
 
-Pa.prototype.buildPage = function (data) {
+Pa.prototype.buildPages = function (data) {
 
     let prevPage = this.prevPage = document.createElement('ul')
     prevPage.classList.add('prev_page')
 
 
     let currPage = this.currPage = document.createElement('ul')
-    currPage.classList.add('current_page')
-    data['list'].forEach(item => {
-        let li = document.createElement('li')
-        li.appendChild(this.options.itemAdapter(item));
-        currPage.appendChild(li);
-    })
+    currPage.classList.add('current_page', 'loading');
+    this.buildPage(currPage, data);
 
     let nextPage = this.nextPage = document.createElement('ul')
     nextPage.classList.add('next_page')
@@ -65,6 +57,18 @@ Pa.prototype.buildPage = function (data) {
     this.container.appendChild(currPage)
     this.container.appendChild(nextPage)
     this.nextPage.scrollTop = 0;
+}
+
+Pa.prototype.buildPage = function(page, data){
+    page.classList.remove('loading');
+    page.innerHTML = '';
+
+    data = this.options.dataAdapter(data);
+    data['list'].forEach(item => {
+        let li = document.createElement('li');
+        li.appendChild(this.options.itemAdapter(item));
+        page.appendChild(li);
+    })
 }
 
 export default Pa
