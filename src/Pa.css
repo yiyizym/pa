@@ -106,18 +106,26 @@ li {
     }
 }
 
-.show_page_hint::after {
-    display: flex;
+.page_hint {
+    display: none;
     position: absolute;
-    content: attr(data-hint);
-    bottom: 0;
+    top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+.page_hint.under_currpage,
+.page_hint.on_currpage {
+    display: flex;
     justify-content: center;
     align-items: flex-end;
     color: #fff;
     background-color: rgb(0, 0, 0);
+}
+
+.page_hint.under_currpage{
+    z-index: -1;
 }
 
 .loading::before {

@@ -22,41 +22,33 @@ const Pa = function (options) {
     },options);
     console.log(this.options);
     this.container = document.querySelector(this.options.selector) || document.createElement('div')
-    this.container.classList.add('pa_container')
+    this.container.classList.add('pa_container');
+
+    this.prevPage = document.createElement('ul')
+    this.prevPage.classList.add('prev_page')
+    this.container.appendChild(this.prevPage)
+
+    this.currPage = document.createElement('ul')
+    this.currPage.classList.add('current_page', 'loading');
+    this.container.appendChild(this.currPage)
+
+    this.nextPage = document.createElement('ul')
+    this.nextPage.classList.add('next_page')
+    this.container.appendChild(this.nextPage)
+
 
     dataManager.init({
         url: this.options.url
     });
 
     dataManager.fetchFirstPage().then((data) => {
-        this.buildPages(data);
+        this.buildPage(this.currPage, data);
         turnPageManager.init({
             paginator: this,
             dataManager: dataManager
         })
     });
 
-}
-
-Pa.prototype.buildPages = function (data) {
-
-    let prevPage = this.prevPage = document.createElement('ul')
-    prevPage.classList.add('prev_page')
-
-
-    let currPage = this.currPage = document.createElement('ul')
-    currPage.classList.add('current_page', 'loading');
-    this.buildPage(currPage, data);
-
-    let nextPage = this.nextPage = document.createElement('ul')
-    nextPage.classList.add('next_page')
-
-
-    this.container.appendChild(prevPage)
-    this.prevPage.scrollTop = constant.MAX_HEIGHT;
-    this.container.appendChild(currPage)
-    this.container.appendChild(nextPage)
-    this.nextPage.scrollTop = 0;
 }
 
 Pa.prototype.buildPage = function(page, data){

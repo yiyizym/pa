@@ -11,9 +11,9 @@ export default {
 
         this.dataManager = options.dataManager;
 
-        this.prevPage = this.paginator.options.prevPage;
-        this.currPage = this.paginator.options.currPage;
-        this.nextPage = this.paginator.options.nextPage;
+        this.prevPage = this.paginator.prevPage;
+        this.currPage = this.paginator.currPage;
+        this.nextPage = this.paginator.nextPage;
 
         pubSub.subscribe('position', (_, pos) => {
             console.log('page position: ', pos)
@@ -212,30 +212,32 @@ export default {
 
     setPageHint(to, opacity){
         console.log('setPageHint')
+        var pageHint = this.paginator.container.querySelector('.page_hint');
+        if(!pageHint){
+            pageHint = document.createElement('div');
+            pageHint.classList.add('page_hint');
+            this.paginator.container.appendChild(pageHint);
+        }
         switch (to) {
             case 'next':
-                setPageHint(this.nextPage, `下翻至 ${this.dataManager.getCurrPage() + 2} 页`);
+                pageHint.textContent = `下翻至 ${this.dataManager.getCurrPage() + 2} 页`;
+                pageHint.classList.add('under_currpage');
                 break;
             case 'prev':
-                setPageHint(this.currPage, `上翻至 ${this.dataManager.getCurrPage()} 页`);
-                break;
-            default:
+                pageHint.textContent = `上翻至 ${this.dataManager.getCurrPage()} 页`;
+                pageHint.classList.add('on_currpage');
                 break;
         }
-
-        function setPageHint(el, hint){
-            el.classList.add('show_page_hint');
-            el.dataset.hint = hint;
-            el.style.opacity = opacity;
-        }
+        pageHint.style.opacity = opacity;
     },
 
     resetPageHint(){
         console.log('resetPageHint');
-        [this.currPage, this.prevPage, this.nextPage].map(el => {
-            el.classList.remove('show_page_hint');
-            delete el.dataset.hint;
-            el.style.opacity = 1;
-        })
+        var pageHint = this.paginator.container.querySelector('.page_hint');
+        if (!pageHint) {
+            return;
+        }
+        pageHint.style.opacity = 'unset';
+        pageHint.classList.remove('on_currpage', 'under_currpage');
     }
 }
